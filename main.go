@@ -20,8 +20,11 @@ import (
 	"github.com/manifoldco/promptui"
 	"github.com/pcunning/hamcall/b2"
 	"github.com/pcunning/hamcall/data"
+	"github.com/pcunning/hamcall/source/geo"
 	"github.com/pcunning/hamcall/source/ised"
 	"github.com/pcunning/hamcall/source/lotw"
+	"github.com/pcunning/hamcall/source/radioid"
+	"github.com/pcunning/hamcall/source/uls"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -86,21 +89,21 @@ func downloadFiles() {
 
 	wg.Add(2)
 
-	// go uls.Download(&wg)
+	go uls.Download(&wg)
 	go ised.Download(&wg)
-	// go radioid.Download(&wg)
+	go radioid.Download(&wg)
 	go lotw.Download(&wg)
-	// go geo.Download(&wg)
+	go geo.Download(&wg)
 
 	wg.Wait()
 }
 
 func process(calls *map[string]data.HamCall) {
-	// uls.Process(calls)
+	uls.Process(calls)
 	ised.Process(calls)
-	// radioid.Process(calls)
+	radioid.Process(calls)
 	lotw.Process(calls)
-	// geo.Process(calls)
+	geo.Process(calls)
 }
 
 func writeToB2(calls *map[string]data.HamCall, keyID, applicationKey string, uploadWorkers int, osSigExit chan bool, dryRun bool) {
