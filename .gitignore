@@ -2,6 +2,7 @@
 *.dat
 *.zip
 *.json
+*.txt
 amat
 
 .env
