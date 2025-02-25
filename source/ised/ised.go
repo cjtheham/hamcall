@@ -1,10 +1,8 @@
 package ised
 
 import (
-	"archive/zip"
 	"bufio"
 	"fmt"
-	"io"
 	"log"
 	"os"
 	"strings"
@@ -32,38 +30,14 @@ func Process(calls *map[string]data.HamCall) {
 	// START
 
 	// Step 1: Unzip the file and create ised_callsigns.txt.
-	reader, err := zip.OpenReader("ised.zip")
+	_, err := downloader.Unzip("ised.zip", "ised_data")
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
 		return
-	}
-	defer reader.Close()
-
-	for _, f := range reader.File {
-		if f.Name == "amateur_delim.txt" {
-			destinationFile, err := os.OpenFile("ised_callsigns.txt", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, f.Mode())
-			if err != nil {
-				log.Fatal(err)
-				return
-			}
-			defer destinationFile.Close()
-
-			zippedFile, err := f.Open()
-			if err != nil {
-				log.Fatal(err)
-				return
-			}
-			defer zippedFile.Close()
-
-			if _, err := io.Copy(destinationFile, zippedFile); err != nil {
-				log.Fatal(err)
-				return
-			}
-		}
 	}
 
 	// Step 2: Open the new file.
-	f, err := os.Open("ised_callsigns.txt")
+	f, err := os.Open("ised_data/ised_callsigns.txt")
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -81,17 +55,17 @@ func Process(calls *map[string]data.HamCall) {
 		} else {
 			name := columns[1] + " " + columns[2]
 			item := data.HamCall{
-				Callsign: columns[0],
-				Name: name,
+				Callsign:  columns[0],
+				Name:      name,
 				FirstName: columns[1],
-				LastName: columns[2],
-				Address: columns[3],
-				City: columns[4],
-				Zip: columns[6],
+				LastName:  columns[2],
+				Address:   columns[3],
+				City:      columns[4],
+				Zip:       columns[6],
 			}
 			(*calls)[columns[0]] = item
 		}
-	
+
 	}
 
 	// END
