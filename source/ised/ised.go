@@ -37,7 +37,7 @@ func Process(calls *map[string]data.HamCall) {
 	}
 
 	// Step 2: Open the new file.
-	f, err := os.Open("ised_data/ised_callsigns.txt")
+	f, err := os.Open("ised_data/amateur_delim.txt")
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -53,6 +53,23 @@ func Process(calls *map[string]data.HamCall) {
 		if columns[0] == "callsign" {
 			continue
 		} else {
+			var class string
+			switch {
+			case columns[7] != "" && columns[11] == "":
+				class = "Basic"
+			case columns[11] != "" && columns[10] == "":
+				class = "Basic with Honors"
+			case columns[10] != "":
+				class = "Advanced"
+			default:
+				class = "Unknown"
+			}
+			switch {
+			case columns[8] != "":
+				class += " (5wpm)"
+			case columns[9] != "":
+				class += " (12wpm)"
+			}
 			name := columns[1] + " " + columns[2]
 			item := data.HamCall{
 				Callsign:  columns[0],
@@ -62,6 +79,7 @@ func Process(calls *map[string]data.HamCall) {
 				Address:   columns[3],
 				City:      columns[4],
 				Zip:       columns[6],
+				Class:     class,
 			}
 			(*calls)[columns[0]] = item
 		}
