@@ -64,11 +64,11 @@ func Process(calls *map[string]data.HamCall) {
 			default:
 				class = "Unknown"
 			}
-			switch {
-			case columns[8] != "":
-				class += " (5wpm)"
+			switch class == "Basic" {
 			case columns[9] != "":
 				class += " (12wpm)"
+			case columns[8] != "":
+				class += " (5wpm)"
 			}
 			name := columns[1] + " " + columns[2]
 			item := data.HamCall{
